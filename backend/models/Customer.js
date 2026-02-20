@@ -1,0 +1,32 @@
+const mongoose = require('mongoose');
+
+const customerSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'Name is required'],
+    trim: true
+  },
+  email: {
+    type: String,
+    required: [true, 'Email is required'],
+    unique: true,
+    lowercase: true
+  },
+  phone: {
+    type: String,
+    required: false
+  },
+  company: {
+    type: String,
+    required: false
+  },
+  status: {
+    type: String,
+    enum: ['active', 'inactive'],
+    default: 'active'
+  }
+}, {
+  timestamps: true
+});
+
+module.exports = mongoose.model('Customer', customerSchema);
