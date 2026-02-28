@@ -1,25 +1,20 @@
-import axios from 'axios';
+const API_BASE_URL = import.meta.env.DEV 
+  ? 'http://localhost:5000/api/v1'
+  : 'https://crm-system-wwmg.onrender.com/api/v1';
 
-const BASE_URL = import.meta.env.DEV 
-  ? 'http://localhost:5000' 
-  : 'https://crm-system-wwmg.onrender.com/api/v1'; 
-
-export const apiCall = async (url, options = {}) => {
-  try {
-    const response = await axios({
-      url: `${BASE_URL}${url}`,
-      method: options.method || 'GET',
-      data: options.body,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(localStorage.getItem('token') && {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        })
-      }
-    });
-    return response.data;
-  } catch (error) {
-    console.error('API Error:', error.response?.data);
-    throw error;
-  }
+export const api = {
+  getCustomers: () => fetch(`${API_BASE_URL}/customers`),
+  createCustomer: (data) => fetch(`${API_BASE_URL}/customers`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }),
+  updateCustomer: (id, data) => fetch(`${API_BASE_URL}/customers/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }),
+  deleteCustomer: (id) => fetch(`${API_BASE_URL}/customers/${id}`, {
+    method: 'DELETE'
+  })
 };
