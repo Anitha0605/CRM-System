@@ -1,3 +1,4 @@
+// App.jsx - YOUR CODE FIXED
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import CustomerList from './components/CustomerList';
@@ -6,7 +7,6 @@ import CustomerModal from './components/CustomerModal';
 import './App.css';
 
 const API_BASE_URL = 'http://localhost:5000/api/v1';
-
 
 function App() {
   const [customers, setCustomers] = useState([]);
@@ -17,13 +17,15 @@ function App() {
   const fetchCustomers = useCallback(async () => {
     setLoading(true);
     try {
-      console.log('Fetching customers from:', `${API_BASE_URL}/customers`);
+      console.log('Fetching from:', `${API_BASE_URL}/customers`);
       const response = await axios.get(`${API_BASE_URL}/customers`);
-      console.log('API Response:', response.data);
-      setCustomers(response.data.data || []); // Set empty array if data is undefined
+      console.log('✅ Response:', response.data);
+      
+      // Backend sends {success: true, customers: []}
+      setCustomers(response.data.customers || response.data || []);
     } catch (error) {
-      console.error('Error fetching customers:', error);
-      setCustomers([]); // Set to empty array on error to prevent undefined issues
+      console.error('❌ Error:', error.response?.data || error.message);
+      setCustomers([]);
     }
     setLoading(false);
   }, []);
@@ -33,7 +35,7 @@ function App() {
   }, [fetchCustomers]);
 
   const refreshCustomers = useCallback(() => {
-    console.log('Refreshing customer list...');
+    console.log('🔄 Refreshing...');
     fetchCustomers();
     setShowModal(false);
     setSelectedCustomer(null);
@@ -61,10 +63,7 @@ function App() {
       {showModal && selectedCustomer && (
         <CustomerModal
           customer={selectedCustomer}
-          onClose={() => {
-            setShowModal(false);
-            setSelectedCustomer(null);
-          }}
+          onClose={refreshCustomers}
           refreshCustomers={refreshCustomers}
         />
       )}

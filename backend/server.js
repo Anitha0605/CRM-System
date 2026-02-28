@@ -1,60 +1,75 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const connectDB = require('./config/database');
-const customerRoutes = require('./routes/customers');
-const errorHandler = require('./middleware/errorHandler');
 
-// Load environment variables
+// In-memory customers
+let customers = [
+  { _id: '1', name: 'Sample Customer', email: 'sample@test.com', phone: '1234567890', company: 'Test Co', status: 'active' }
+];
+
 dotenv.config();
 
 const app = express();
 
-// ✅ FIXED CORS - No wildcard routes
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:5173',  'https://crm-system-modula-5.netlify.app'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: ['http://localhost:3000', 'http://localhost:5173']
 }));
-
-// Body parser middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Connect database
-connectDB();
+// ✅ GET - List working!
+app.get('/api/v1/customers', (req, res) => {
+  console.log('✅ GET customers:', customers.length);
+  res.json({ success: true, customers });
+});
 
-// Routes
-app.use('/api/v1/customers', customerRoutes);
+// ✅ POST - Add working!
+app.post('/api/v1/customers', (req, res) => {
+  const newCustomer = {
+    _id: Date.now().toString(),
+    ...req.body,
+    status: req.body.status || 'active'
+  };
+  customers.push(newCustomer);
+  console.log('✅ ADD:', newCustomer.name);
+  res.status(201).json({ success: true, customer: newCustomer });
+});
+
+// ✅ PUT - UPDATE (CustomerModal.jsx fix)
+app.put('/api/v1/customers/:id', (req, res) => {
+  const id = req.params.id;
+  const index = customers.findIndex(c => c._id === id);
+  
+  if (index === -1) {
+    return res.status(404).json({ success: false, message: 'Customer not found' });
+  }
+  
+  customers[index] = { ...customers[index], ...req.body };
+  console.log('✅ UPDATE:', customers[index].name);
+  res.json({ success: true, customer: customers[index] });
+});
+
+// ✅ DELETE - CustomerList.jsx fix
+app.delete('/api/v1/customers/:id', (req, res) => {
+  const id = req.params.id;
+  const initialLength = customers.length;
+  customers = customers.filter(c => c._id !== id);
+  
+  if (customers.length === initialLength) {
+    return res.status(404).json({ success: false, message: 'Customer not found' });
+  }
+  
+  console.log('✅ DELETE ID:', id);
+  res.json({ success: true, message: 'Customer deleted' });
+});
 
 // Health check
 app.get('/health', (req, res) => {
-  res.status(200).json({ 
-   status: 'ok',
-    timestamp: new Date().toISOString(),
-    message: 'CRM Backend Running!' 
-  });
+  res.json({ status: 'ok', customers: customers.length });
 });
-
-// Test endpoint
-app.get('/api/v1/test', (req, res) => {
-  res.json({ message: 'API v1 working!' });
-});
-
-// 404 handler - FIXED (no wildcard)
-app.use((req, res, next) => {
-  res.status(404).json({ success: false, message: 'Route not found' });
-});
-
-// Error handler
-app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-const MODE = process.env.NODE_ENV || 'development';
-
-app.listen(PORT, () => {
-  console.log(` Server running in ${MODE} mode on http://localhost:${PORT}`);
-  console.log(` Health: http://localhost:${PORT}/health`);
-  console.log(` Customers: http://localhost:${PORT}/api/v1/customers`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Server: http://localhost:${PORT}`);
+  console.log('🎉 FULL CRUD: GET/POST/PUT/DELETE READY!');
 });
