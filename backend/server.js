@@ -14,7 +14,7 @@ app.use(cors({
   origin: [
     'http://localhost:3000', 
     'http://localhost:5173',
-    'https://crm-system-8jp53j2cu-anitha0605s-projects.vercel.app'
+    'https://crm-system-module5.netlify.app'
   ],
   credentials: true
 }));
