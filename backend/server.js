@@ -15,7 +15,6 @@ app.use(cors({
     'http://localhost:3000', 
     'http://localhost:5173',
     'http://localhost:5174', 
-    'http://192.168.1.10:5174',
     'https://crm-system-module5.netlify.app'
   ],
   credentials: true
