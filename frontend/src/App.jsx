@@ -1,4 +1,3 @@
-// App.jsx - YOUR CODE FIXED
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import CustomerList from './components/CustomerList';
@@ -6,7 +5,8 @@ import CustomerForm from './components/CustomerForm';
 import CustomerModal from './components/CustomerModal';
 import './App.css';
 
-const API_BASE_URL = 'http://localhost:5000/api/v1';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://crm-system-wwmg.onrender.com/api/v1';
 
 function App() {
   const [customers, setCustomers] = useState([]);
@@ -17,29 +17,39 @@ function App() {
   const fetchCustomers = useCallback(async () => {
     setLoading(true);
     try {
-      console.log('Fetching from:', `${API_BASE_URL}/customers`);
+     
       const response = await axios.get(`${API_BASE_URL}/customers`);
-      console.log('✅ Response:', response.data);
       
-      // Backend sends {success: true, customers: []}
-      setCustomers(response.data.customers || response.data || []);
+      console.log(' API Response:', response.data);
+
+    
+      if (response.data && response.data.success) {
+        setCustomers(response.data.customers);
+      }
     } catch (error) {
-      console.error('❌ Error:', error.response?.data || error.message);
+      console.error('❌ Fetch Error:', error.message);
       setCustomers([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => {
     fetchCustomers();
   }, [fetchCustomers]);
 
+ 
   const refreshCustomers = useCallback(() => {
-    console.log('🔄 Refreshing...');
     fetchCustomers();
     setShowModal(false);
     setSelectedCustomer(null);
   }, [fetchCustomers]);
+
+ 
+  const handleEdit = (customer) => {
+    setSelectedCustomer(customer);
+    setShowModal(true);
+  };
 
   return (
     <div className="App">
@@ -49,22 +59,28 @@ function App() {
       </header>
 
       <div className="container">
-        <CustomerForm refreshCustomers={refreshCustomers} />
+        <CustomerForm 
+          refreshCustomers={refreshCustomers} 
+          apiUrl={API_BASE_URL} 
+        />
+        
         <CustomerList 
           customers={customers}
           loading={loading}
-          onEditCustomer={setSelectedCustomer}
-          onViewCustomer={setSelectedCustomer}
+          onEditCustomer={handleEdit}
+          onViewCustomer={handleEdit}
           setShowModal={setShowModal}
           refreshCustomers={refreshCustomers}
+          apiUrl={API_BASE_URL}
         />
       </div>
 
       {showModal && selectedCustomer && (
         <CustomerModal
           customer={selectedCustomer}
-          onClose={refreshCustomers}
+          onClose={() => setShowModal(false)}
           refreshCustomers={refreshCustomers}
+          apiUrl={API_BASE_URL}
         />
       )}
     </div>
