@@ -5,7 +5,6 @@ require('dotenv').config();
 
 const app = express();
 
-// 1. எல்லா Network-களையும் அனுமதிக்கும் CORS
 app.use(cors({
   origin: "*", 
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -14,7 +13,7 @@ app.use(cors({
 
 app.use(express.json());
 
-// Request Logger (டேட்டா வருகிறதா என்று பார்க்க)
+// Request Logger 
 app.use((req, res, next) => {
   console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.url}`);
   next();
@@ -22,8 +21,8 @@ app.use((req, res, next) => {
 
 // 2. MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.log("❌ DB Error:", err.message));
+  .then(() => console.log(" MongoDB Connected"))
+  .catch(err => console.log(" DB Error:", err.message));
 
 // 3. Schema & Model
 const customerSchema = new mongoose.Schema({
@@ -77,5 +76,5 @@ app.delete('/api/v1/customers/:id', async (req, res) => {
 // 5. Start Server
 const PORT = 5000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server ready at http://localhost:${PORT}`);
+  console.log(`Server ready at http://localhost:${PORT}`);
 });
