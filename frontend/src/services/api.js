@@ -1,33 +1,20 @@
-// Check if we are on localhost or production
-const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+import axios from 'axios';
+
+const YOUR_LAPTOP_IP = '192.168.1.15'; // 👈 உங்கள் IP-ஐ இங்கே மாற்றவும்
+const isLocal = window.location.hostname === 'localhost';
 
 const API_BASE_URL = isLocal 
   ? 'http://localhost:5000/api/v1' 
-  : 'https://crm-system-wwmg.onrender.com/api/v1';
-
-const handleResponse = async (res) => {
-  if (!res.ok) {
-    const errorBody = await res.text();
-    throw new Error(`API Error (${res.status}): ${errorBody}`);
-  }
-  return res.json();
-};
+  : `http://${YOUR_LAPTOP_IP}:5000/api/v1`;
 
 export const api = {
+  // GET: { success: true, customers: [...] } என்ற ஆப்ஜெக்ட்டை அப்படியே தரும்
   getCustomers: async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/customers`);
-      return await handleResponse(response);
-    } catch (error) {
-      console.error("Network Error:", error);
-      throw error;
-    }
+    const res = await axios.get(`${API_BASE_URL}/customers`);
+    return res.data; 
   },
-
-  createCustomer: (data) => 
-    fetch(`${API_BASE_URL}/customers`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    }).then(handleResponse)
+  
+  createCustomer: (data) => axios.post(`${API_BASE_URL}/customers`, data),
+  updateCustomer: (id, data) => axios.put(`${API_BASE_URL}/customers/${id}`, data),
+  deleteCustomer: (id) => axios.delete(`${API_BASE_URL}/customers/${id}`)
 };
