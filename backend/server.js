@@ -35,7 +35,7 @@ const Customer = mongoose.model('Customer', customerSchema);
 // 4. API Routes
 // Health Check 
 app.get('/health', (req, res) => {
-  res.status(200).send("Server is Running and Healthy! 🚀");
+  res.status(200).send("Server is Running and Healthy! ");
 });
 
 // GET all customers
