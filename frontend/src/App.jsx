@@ -7,6 +7,7 @@ import CustomerModal from './components/CustomerModal';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import './App.css';
+import Navbar from './components/Navbar';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://crm-system-wwmg.onrender.com/api/v1';
 
@@ -16,7 +17,7 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // User login aagi irukkarannu check panna (Simple Logic)
+  
   const isAuthenticated = !!localStorage.getItem('token');
 
   const fetchCustomers = useCallback(async () => {
@@ -84,8 +85,8 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          
-          {/* Dashboard-a secure panna: Login pannala na login page-ku poga vakkum */}
+          <Route path="/navbar" element={<Navbar />} />
+         
           <Route 
             path="/" 
             element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
