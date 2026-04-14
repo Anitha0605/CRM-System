@@ -6,8 +6,8 @@ import CustomerForm from './components/CustomerForm';
 import CustomerModal from './components/CustomerModal';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Navbar from './components/Navbar'; // Namma design panna Navbar
 import './App.css';
-import Navbar from './components/Navbar';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://crm-system-wwmg.onrender.com/api/v1';
 
@@ -17,11 +17,11 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  
+  // Authentication Check
   const isAuthenticated = !!localStorage.getItem('token');
 
   const fetchCustomers = useCallback(async () => {
-    if (!isAuthenticated) return; // Login pannala na fetch panna venaam
+    if (!isAuthenticated) return;
     
     setLoading(true);
     try {
@@ -54,7 +54,6 @@ function App() {
     setShowModal(true);
   };
 
-  // Main Dashboard UI (Private Content)
   const Dashboard = () => (
     <div className="container">
       <CustomerForm refreshCustomers={refreshCustomers} apiUrl={API_BASE_URL} />
@@ -73,24 +72,19 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <header className="app-header">
-          <h1>CRM System</h1>
-          {isAuthenticated && (
-            <button onClick={() => { localStorage.removeItem('token'); window.location.href='/login'; }}>
-              Logout
-            </button>
-          )}
-        </header>
+        {/* Login panniruntha mattum Navbar kaattum */}
+        {isAuthenticated && <Navbar />}
 
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/navbar" element={<Navbar />} />
-         
+          
           <Route 
             path="/" 
             element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} 
           />
+          {/* Default catch-all route */}
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
 
         {showModal && selectedCustomer && (

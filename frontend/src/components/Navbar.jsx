@@ -5,23 +5,21 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Token clear panna
-    navigate('/login'); // Login-ku poga
+    localStorage.removeItem('token'); // Token clear pannum
+    // window.location.href use pannalam illa navigate use pannalam
+    window.location.href = '/login'; 
   };
 
   return (
-    <nav className="navbar">
-      <div className="nav-container">
-        <h1 className="nav-logo" onClick={() => navigate('/')}>
-          📊 CRM System
-        </h1>
-        
-        <div className="nav-links">
-          <span className="user-welcome">Welcome, Tanika!</span>
-          <button className="logout-btn" onClick={handleLogout}>
-            <span className="icon">🚪</span> Logout
-          </button>
-        </div>
+    <nav className="custom-navbar">
+      <div className="nav-logo">
+        📊 <span>CRM Portal</span>
+      </div>
+      <div className="nav-actions">
+        <span className="user-tag">Hi, User!</span>
+        <button className="logout-btn-modern" onClick={handleLogout}>
+          Logout 🚪
+        </button>
       </div>
     </nav>
   );
